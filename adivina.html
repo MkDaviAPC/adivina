@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego de Adivinar el Número</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #fff; 
+            color: #333;
+            text-align: center;
+        }
+
+        .container {
+            margin-top: 50px;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            display: inline-block;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        input[type="number"] {
+            padding: 10px;
+            font-size: 16px;
+            margin: 10px;
+            border: 1px solid #666;
+            border-radius: 5px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            color: #fff;
+            background-color: #4CAF50;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049; 
+        }
+
+        p {
+            font-size: 18px;
+            color: #333;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Juego de Adivinar el Número</h1>
+        <p>Intenta adivinar el número entre 1 y 100:</p>
+        <input type="number" id="guessInput" min="1" max="100" oninput="validateInput(event)" onkeydown="handleKeyDown(event)">
+        <button onclick="checkGuess()">Adivinar</button>
+        <p id="result"></p>
+        <p id="attempts" class="hidden"></p>
+    </div>
+
+    <script>
+        let randomNumber = Math.floor(Math.random() * 100) + 1;
+        let attempts = 0;
+        const previousGuesses = new Set();
+
+        function checkGuess() {
+            const guessInput = document.getElementById('guessInput');
+            const guess = parseInt(guessInput.value);
+            const result = document.getElementById('result');
+            const attemptsText = document.getElementById('attempts');
+
+            if (!guess || isNaN(guess) || guess < 1 || guess > 100) {
+                result.textContent = 'Por favor, ingresa un número válido entre 1 y 100.';
+                result.style.color = 'red';
+                return;
+            }
+
+            if (previousGuesses.has(guess)) {
+                result.textContent = `Ya has intentado con el número ${guess}. Intenta con otro número.`;
+                result.style.color = 'orange';
+
+                setTimeout(() => {
+                    result.textContent = '';
+                    showHint(guess);
+                }, 2000);
+                return;
+            }
+
+            previousGuesses.add(guess);
+            attempts++;
+
+            if (guess === randomNumber) {
+                result.textContent = `¡Felicidades! Adivinaste el número en ${attempts} intentos.`;
+                result.style.color = 'green';
+                attemptsText.classList.add('hidden');
+                setTimeout(resetGame, 3000);
+            } else {
+                showHint(guess);
+            }
+
+            attemptsText.textContent = `Número de intentos: ${attempts}`;
+            attemptsText.classList.remove('hidden');
+        }
+
+        function showHint(guess) {
+            const result = document.getElementById('result');
+
+            if (guess < randomNumber) {
+                result.textContent = 'El número es mayor. Intenta de nuevo.';
+                result.style.color = 'red';
+            } else if (guess > randomNumber) {
+                result.textContent = 'El número es menor. Intenta de nuevo.';
+                result.style.color = 'red';
+            }
+        }
+
+        function resetGame() {
+            randomNumber = Math.floor(Math.random() * 100) + 1;
+            attempts = 0;
+            previousGuesses.clear();
+            document.getElementById('guessInput').value = '';
+            document.getElementById('result').textContent = '';
+            document.getElementById('attempts').classList.add('hidden');
+        }
+
+        function validateInput(event) {
+            const input = event.target;
+            input.value = input.value.replace(/[^0-9]/g, '');
+        }
+
+        function handleKeyDown(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                checkGuess();
+            } 
+        }
+    </script> 
+</body>
+</html>
+
+
